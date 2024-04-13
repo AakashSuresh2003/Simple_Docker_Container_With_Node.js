@@ -6,44 +6,37 @@ const app = express();
 app.use(express.json());
 
 // Routes
-app.get("/", async(req,res)=>{
-    try{
+app.get("/", async (req, res) => {
+    try {
         const data = await pool.query('SELECT * FROM schools');
-
-        res.sendStatus(200).send(data.rows)
-    }
-    catch(err)
-    {
+        res.status(200).send(data.rows); // Use res.status().send() to set status and send response
+    } catch (err) {
         console.log(err);
-        res.sendStatus(500);
+        res.status(500).send("Internal Server Error"); // Send a generic error message
     }
 })
 
-app.post("/", async(req,res)=>{
-    const {name,location} = req.body;
-    try{
-        await pool.query('INSERT INTO schools (name,address) VALUES ($1,$2)',[name,location]);
-        res.sendStatus(200).send({message:"Successfully added child"})
-    }
-    catch(err)
-    {
+app.post("/", async (req, res) => {
+    const { name, location } = req.body;
+    try {
+        await pool.query('INSERT INTO schools (name,address) VALUES ($1,$2)', [name, location]);
+        res.status(200).send({ message: "Successfully added child" });
+    } catch (err) {
         console.log(err);
-        res.sendStatus(500);
+        res.status(500).send("Internal Server Error");
     }
 })
 
-app.get("/setup", async (req,res)=>{
-    try{
+app.get("/setup", async (req, res) => {
+    try {
         await pool.query('CREATE TABLE schools( id SERIAL PRIMARY KEY, name VARCHAR(100),address VARCHAR(100))');
-        res.sendStatus(200).send({message:"Successfully created table"});
-    }
-    catch(err)
-    {
+        res.status(200).send({ message: "Successfully created table" });
+    } catch (err) {
         console.log(err);
-        res.sendStatus(500);
+        res.status(500).send("Internal Server Error");
     }
 })
 
-app.listen(PORT,()=>{
+app.listen(PORT, () => {
     console.log(`Server listening on the PORT ${PORT}`)
 })
